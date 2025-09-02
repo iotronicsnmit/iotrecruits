@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IOTRONICS - Recruitment Challenge</title>
+  <link rel="stylesheet" href="styles.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <nav id="top-navbar" class="navbar hidden">
+    <div class="navbar-brand">
+      <span class="brand-icon">⚡</span>
+      <span class="brand-text">IOTRONICS NEURAL LAB</span>
+    </div>
+    
+    <!-- Desktop Navigation Menu -->
+    <div class="navbar-menu desktop-menu">
+      <div class="navbar-section">
+        <button class="nav-btn" onclick="goToProfile()" title="Neural Profile">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Profile</span>
+        </button>
+        <button class="nav-btn" onclick="goToTraining()" title="Training Protocols">
+          <span class="nav-icon">🎮</span>
+          <span class="nav-label">Training</span>
+        </button>
+        <button class="nav-btn" onclick="goToLeaderboard()" title="Hall of Legends">
+          <span class="nav-icon">🏆</span>
+          <span class="nav-label">Rankings</span>
+        </button>
+      </div>
+      
+      <div class="navbar-section">
+        <div class="nav-status" id="nav-status">
+          <span class="status-text">Offline</span>
+        </div>
+        <button class="nav-btn secondary" onclick="showNavMenu()" title="More Options">
+          <span class="nav-icon">⚙️</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Hamburger Menu -->
+    <div class="mobile-menu">
+      <div class="nav-status mobile-status" id="nav-status-mobile">
+        <span class="status-text">Offline</span>
+      </div>
+      <button class="hamburger-btn" onclick="toggleMobileMenu()" id="hamburger-btn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Slide Menu -->
+  <div id="mobile-slide-menu" class="mobile-slide-menu hidden">
+    <div class="slide-menu-content">
+      <div class="slide-menu-header">
+        <h3>NEURAL CONTROL</h3>
+        <button class="close-menu-btn" onclick="closeMobileMenu()">✕</button>
+      </div>
+      
+      <div class="slide-menu-section">
+        <h4>Navigation</h4>
+        <button class="slide-menu-btn" onclick="goToProfile(); closeMobileMenu();">
+          <span class="menu-icon">👤</span>
+          Neural Profile
+        </button>
+        <button class="slide-menu-btn" onclick="goToTraining(); closeMobileMenu();">
+          <span class="menu-icon">🎮</span>
+          Training Protocols
+        </button>
+        <button class="slide-menu-btn" onclick="goToLeaderboard(); closeMobileMenu();">
+          <span class="menu-icon">🏆</span>
+          Hall of Legends
+        </button>
+      </div>
+      
+      <div class="slide-menu-section">
+        <h4>Account</h4>
+        <button class="slide-menu-btn" onclick="editProfile(); closeMobileMenu();">
+          <span class="menu-icon">✏️</span>
+          Edit Profile
+        </button>
+        <button class="slide-menu-btn" onclick="logoutProfile(); closeMobileMenu();">
+          <span class="menu-icon">🚪</span>
+          Exit Session
+        </button>
+      </div>
+      
+      <div class="slide-menu-section">
+        <h4>System</h4>
+        <button class="slide-menu-btn" onclick="debugCurrentState(); closeMobileMenu();">
+          <span class="menu-icon">🔧</span>
+          Debug Info
+        </button>
+        <button class="slide-menu-btn" onclick="window.location.reload();">
+          <span class="menu-icon">🔄</span>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Screen 1 -->
+    <div id="screen1" class="screen">
+      <div class="club-logo-container">
+        <img src="club-logo.gif" alt="IOTRONICS Club Logo" id="club-logo" class="animated-logo">
+      </div>
+      <h1 id="glitch-text">Welcome to the IOTRONICS CHALLENGE</h1>
+      <p id="typewriter-text" class="typing"></p>
+      <button onclick="goToScreen2()">Start Challenge</button>
+    </div>
+
+    <!-- Screen 2 -->
+    <div id="screen2" class="screen hidden">
+      <h2>ENTER ACCESS CODE</h2>
+      <p>Enter the secret code to continue:</p>
+      <p class="access-hint">💡 <em>Look for the access key on the poster</em></p>
+      <input type="text" id="access-input" placeholder="Type your code here" />
+      <button onclick="checkAccess()">Submit</button>
+      <p id="access-msg"></p>
+    </div>
+
+    <!-- Access Method Selection Screen -->
+    <div id="access-method" class="screen hidden">
+      <h2>WELCOME TO THE CHALLENGE</h2>
+      <p>Choose how you want to participate:</p>
+      
+      <div class="access-options">
+        <div class="access-option primary-option" onclick="showRegistrationScreen()" tabindex="0" role="button" onkeydown="if(event.key==='Enter') showRegistrationScreen()">
+          <h3>⚡ NEW PARTICIPANT</h3>
+          <p>Create a new account to get started</p>
+        </div>
+        <div class="access-option secondary-option" onclick="showLoginScreen()" tabindex="0" role="button" onkeydown="if(event.key==='Enter') showLoginScreen()">
+          <h3>🔓 EXISTING PARTICIPANT</h3>
+          <p>Log in with your existing account</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen hidden">
+      <h2>LOGIN</h2>
+      <p>Enter your account details:</p>
+      
+      <div class="input-group">
+        <label>Full Name:</label>
+        <input type="text" id="login-name" placeholder="Enter your registered name" maxlength="50" />
+      </div>
+      
+      <div class="input-group">
+        <label>Phone Number:</label>
+        <input type="tel" id="login-phone" placeholder="e.g. +91 9876543210" maxlength="15" />
+      </div>
+      
+      <div class="login-actions">
+        <button onclick="loginStudent()">Login</button>
+        <button onclick="backToAccessMethod()" class="secondary-btn">← Back to Options</button>
+      </div>
+      <p id="login-msg"></p>
+    </div>
+
+    <!-- Student Registration Screen -->
+    <div id="student-registration" class="screen hidden">
+      <h2>CREATE ACCOUNT</h2>
+      <p>Create your account to participate in the challenge:</p>
+      
+      <div class="input-group">
+        <label>Full Name:</label>
+        <input type="text" id="student-name" placeholder="Enter your full name" maxlength="50" />
+      </div>
+      
+      <div class="input-group">
+        <label>Phone Number:</label>
+        <input type="tel" id="student-phone" placeholder="e.g. +91 9876543210" maxlength="15" />
+        <small class="input-note">⚠️ Each phone number can only be used once.</small>
+      </div>
+      
+      <div class="registration-actions">
+        <button onclick="registerStudent()">Create Account</button>
+        <button onclick="backToAccessMethod()" class="secondary-btn">← Back to Options</button>
+      </div>
+      <p id="registration-msg"></p>
+    </div>
+
+    <!-- Player Profile Screen -->
+    <div id="player-status" class="screen hidden">
+      <div class="profile-header">
+        <h2>YOUR PROFILE</h2>
+        <div class="profile-info">
+          <h3 class="operator-name">PARTICIPANT: <span id="profile-name"></span></h3>
+          <p class="profile-id">ID: <span id="profile-phone"></span></p>
+          <p class="profile-timestamp">Joined: <span id="profile-timestamp"></span></p>
+        </div>
+      </div>
+
+      <div class="profile-progress">
+        <h3>CHALLENGE PROGRESS</h3>
+        <div class="progress-overview">
+          <div class="progress-stat">
+            <span class="stat-label">Total Attempts</span>
+            <span class="stat-value" id="total-attempts">0</span>
+          </div>
+          <div class="progress-stat">
+            <span class="stat-label">Games Completed</span>
+            <span class="stat-value" id="completed-protocols">0/1</span>
+          </div>
+          <div class="progress-stat">
+            <span class="stat-label">Status</span>
+            <span class="stat-value" id="sync-status">In Progress</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-grid">
+        <div class="game-status clickable" onclick="startGameFromStatus('orb-game')">
+          <div class="status-header">
+            <h3>COLOR HUNTER</h3>
+            <div class="status-badge" id="chromatic-badge">Ready</div>
+          </div>
+          <div class="status-details">
+            <p>Attempts: <span id="chromatic-attempts">0</span>/3</p>
+            <p>Best Score: <span id="chromatic-best">Not attempted</span></p>
+            <p>Success Rate: <span id="chromatic-rate">0%</span></p>
+          </div>
+          <p class="status-indicator" id="chromatic-status">⚡ READY</p>
+        </div>
+        
+        <div class="game-status clickable" onclick="startGameFromStatus('reaction-game')">
+          <div class="status-header">
+            <h3>QUICK CLICK</h3>
+            <div class="status-badge" id="neural-badge">Ready</div>
+          </div>
+          <div class="status-details">
+            <p>Attempts: <span id="neural-attempts">0</span>/3</p>
+            <p>Best Time: <span id="neural-best">Not attempted</span></p>
+            <p>Success Rate: <span id="neural-rate">0%</span></p>
+          </div>
+          <p class="status-indicator" id="neural-status">⚡ READY</p>
+        </div>
+      </div>
+
+      <div class="profile-navigation">
+        <div class="nav-section">
+          <h4>GAMES</h4>
+          <button class="nav-btn" onclick="proceedToGames()">
+            <span class="btn-icon">🎮</span>
+            Play Games
+          </button>
+        </div>
+        
+        <!-- Completed User Section (shown when everything is done) -->
+        <div class="nav-section" id="completed-user-section" style="display: none;">
+          <h4>CHALLENGE COMPLETE</h4>
+          <button class="nav-btn primary" onclick="viewLeaderboard()">
+            <span class="btn-icon">🏆</span>
+            View Leaderboard
+          </button>
+          <p class="test-description">See your ranking and achievements</p>
+        </div>
+        
+        <div class="nav-section" id="regular-rankings-section">
+          <h4>LEADERBOARD</h4>
+          <button class="nav-btn" onclick="goToLeaderboard()">
+            <span class="btn-icon">🏆</span>
+            View Rankings
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <h4>ACCOUNT</h4>
+          <button class="nav-btn secondary" onclick="editProfile()">
+            <span class="btn-icon">⚙️</span>
+            Edit Profile
+          </button>
+          <button class="nav-btn secondary" onclick="shareResults()">
+            <span class="btn-icon">🚀</span>
+            Share Results
+          </button>
+          <button class="nav-btn secondary" onclick="logoutProfile()">
+            <span class="btn-icon">🚪</span>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Selection Screen -->
+    <div id="game-selection" class="screen hidden">
+      <h2>CHOOSE YOUR GAME</h2>
+      <p>Pick one game to play. You only need to pass one to complete the challenge:</p>
+      
+      <div class="prize-announcement">
+        <div class="prize-item">
+          🏆 <strong>TOP 10 LEADERBOARD:</strong> Amazing gifts await!
+        </div>
+        <div class="prize-item">
+          📸 <strong>INSTAGRAM STORY:</strong> Screenshot your score & tag @iotronics.nmit for 5 special prizes!
+        </div>
+      </div>
+      <div id="game-options">
+        <div class="game-option" onclick="selectGame('orb-game')" tabindex="0" role="button" onkeydown="if(event.key==='Enter') selectGame('orb-game')">
+          <h3>COLOR HUNTER</h3>
+          <p>Click on colored circles that match the target color<br>
+             <span class="game-stats-preview">Goal: Score 7 points in 30 seconds • Test your focus and speed</span></p>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;color:#00ff00;font-weight:bold;">OR</div>
+        <div class="game-option" onclick="selectGame('reaction-game')" tabindex="0" role="button" onkeydown="if(event.key==='Enter') selectGame('reaction-game')">
+          <h3>QUICK CLICK</h3>
+          <p>Click as fast as you can when the signal turns green<br>
+             <span class="game-stats-preview">Goal: Average under 500ms in 5 rounds • Test your reaction time</span></p>
+        </div>
+      </div>
+      
+      <div class="game-selection-nav">
+        <button onclick="showPlayerStatus()">← Back to Profile</button>
+        <button onclick="goToLeaderboard()">View Leaderboard</button>
+      </div>
+    </div>
+
+    <!-- Orb Game Screen -->
+    <div id="orb-game-screen" class="screen hidden">
+      <div class="game-header">
+        <h2>COLOR HUNTER</h2>
+      </div>
+      <p id="orb-game-instruction">Click the <span id="target-color">CYAN</span> colored circle!</p>
+      <div id="orb-game-stats">
+        <div class="stat">Score: <span id="orb-score">0</span> (need 7+)</div>
+        <div class="stat">Time: <span id="orb-timer">30</span>s</div>
+      </div>
+      <div id="orb-game-area">
+        <div id="orb-container"></div>
+      </div>
+      <div id="orb-game-message"></div>
+    </div>
+
+    <!-- Reaction Game Screen -->
+    <div id="reaction-game-screen" class="screen hidden">
+      <div class="game-header">
+        <h2>QUICK CLICK</h2>
+      </div>
+      <p id="reaction-instruction">Average under 500ms to pass • 5 rounds total</p>
+      <div id="reaction-stats">
+        <div class="stat">Round: <span id="reaction-round">1</span>/5</div>
+        <div class="stat">Avg: <span id="avg-time">---</span>ms</div>
+        <div class="stat">Required: <500ms</div>
+      </div>
+      <div id="reaction-area">
+        <div id="reaction-target">WAIT...</div>
+      </div>
+      <div id="reaction-message"></div>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboard-screen" class="screen hidden">
+      <h2>LEADERBOARD</h2>
+      
+      <div class="leaderboard-prizes">
+        <div class="prize-banner">
+          🎁 <strong>TOP 10 GET AMAZING GIFTS!</strong> 🎁
+        </div>
+        <div class="instagram-prize">
+          📸 <strong>BONUS:</strong> Screenshot & tag @iotronics.nmit on Instagram story for 5 extra prizes!
+        </div>
+      </div>
+      
+      <div class="leaderboard-tabs">
+        <button class="tab-btn active" onclick="showLeaderboard('overall')">RANKINGS</button>
+      </div>
+      
+      <!-- Overall Ranking Tab -->
+      <div id="overall-leaderboard" class="leaderboard-content">
+        <div class="leaderboard-header">
+          <span>RANK</span>
+          <span>PARTICIPANT</span>
+          <span>GAME</span>
+          <span>SCORE</span>
+        </div>
+        <div id="overall-scores" class="scores-list">
+          <div class="loading-scores">Loading rankings...</div>
+        </div>
+      </div>
+      
+      <!-- Chromatic Hunter Tab -->
+      
+      
+      <div class="leaderboard-actions">
+        <button onclick="backToStatus()">Return to Profile</button>
+        <button onclick="proceedToGames()">Play Games</button>
+      </div>
+    </div>
+
+    <!-- Score Submission Screen -->
+    <div id="score-submission" class="screen hidden">
+      <h2>GAME COMPLETE</h2>
+      <div id="score-details">
+        <h3 id="game-completed">GAME COMPLETED</h3>
+        <div class="score-summary">
+          <p>Score: <span id="final-score">0</span></p>
+          <p>Performance: <span id="performance-rating">Calculating...</span></p>
+          <p>Rank: <span id="current-rank">Calculating...</span></p>
+        </div>
+      </div>
+      <div class="submission-actions">
+        <button onclick="saveScoreToFirebase()">Save Score</button>
+        <button onclick="showPlayerStatus()">Return to Profile</button>
+      </div>
+      <p id="submission-msg"></p>
+    </div>
+
+    <!-- Final Screen -->
+    <div id="final-screen" class="screen hidden">
+      <h2>🎉 CHALLENGE COMPLETE!</h2>
+      <p>Congratulations! You've successfully completed the IOTRONICS challenge.</p>
+      
+      <!-- Main Recruitment Message -->
+      <div class="recruitment-announcement">
+        <h2 class="recruitment-title">🚀 RECRUITMENTS SOON!</h2>
+        <p class="recruitment-subtitle">Join our WhatsApp group to get instant updates about recruitment opportunities and club activities</p>
+        <a href="https://chat.whatsapp.com/D85rIFcWMXCIF7bevf4dVe?mode=ems_copy_c" target="_blank" class="whatsapp-join-btn">
+          <span class="whatsapp-icon">📱</span>
+          <span class="whatsapp-text">Join WhatsApp Group</span>
+          <span class="whatsapp-subtitle">Get Recruitment Updates</span>
+        </a>
+      </div>
+      
+      <!-- Secondary: Prizes and Social Media -->
+      <div class="final-prizes-info">
+        <div class="final-prize-card">
+          <h3>🏆 LEADERBOARD PRIZES</h3>
+          <p>Top 10 participants get amazing gifts! Check your ranking now.</p>
+        </div>
+        <div class="final-prize-card instagram-card">
+          <h3>📸 INSTAGRAM BONUS</h3>
+          <p>Screenshot your score & tag us on Instagram story for a chance to win 5 special prizes!</p>
+          <small>@iotronics.nmit #IotroncisChallenge</small>
+        </div>
+      </div>
+      
+      <div class="final-navigation">
+        <button class="nav-btn" onclick="viewLeaderboard()">
+          <span class="btn-icon">🏆</span>
+          View Leaderboard
+        </button>
+        <button class="nav-btn" onclick="showPlayerStatus()">
+          <span class="btn-icon">👤</span>
+          View Your Profile
+        </button>
+        <button class="nav-btn" onclick="shareResults()" style="background: linear-gradient(45deg, #00ff00, #00ccff); color: #000;">
+          <span class="btn-icon">📸</span>
+          Share on Instagram
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
