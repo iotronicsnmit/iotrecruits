@@ -64,6 +64,27 @@ node_modules/
 
 # dotenv environment variables file
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Firebase configuration with secrets
+firebase-config.js
+firebase-config.local.js
+
+# API keys and secrets
+**/config/secrets.js
+**/config/keys.js
+**/*-secrets.js
+**/*-keys.js
+**/*.key
+**/*.pem
+**/*.p12
+
+# Service account files
+**/serviceAccountKey.json
+**/service-account-*.json
 
 # dataconnect generated files
 .dataconnect

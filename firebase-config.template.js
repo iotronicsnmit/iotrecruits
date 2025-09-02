@@ -1,12 +1,13 @@
-// Firebase configuration
+// Firebase configuration template
+// Copy this file to firebase-config.js and fill in your actual values
 const firebaseConfig = {
-  apiKey: "AIzaSyBaFwhB_YYXvUNhfpSk0eQovYV854UproU",
-  authDomain: "iotrecruit-9ddd0.firebaseapp.com",
-  projectId: "iotrecruit-9ddd0",
-  storageBucket: "iotrecruit-9ddd0.firebasestorage.app",
-  messagingSenderId: "860401109988",
-  appId: "1:860401109988:web:e74265528a9093d73355f1",
-  measurementId: "G-53KY16KW68"
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  measurementId: "YOUR_MEASUREMENT_ID"
 };
 
 // Initialize Firebase

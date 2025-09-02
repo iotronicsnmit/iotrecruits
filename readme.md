@@ -53,11 +53,35 @@ The recruitment process consists of:
 
 ## Getting Started
 
-1. **Firebase Setup**: Follow `FIREBASE_SETUP.md` to configure the database
-2. **Clone the repository**
-3. **Update Firebase config** in `firebase-config.js` with your project credentials
-4. **Open `index.html`** in a browser
-5. **Complete the recruitment challenges!**
+### 🔐 **Security Setup (IMPORTANT)**
+
+1. **Clone the repository**
+2. **Set up Firebase configuration securely**:
+   ```bash
+   # Copy the template and add your real Firebase credentials
+   cp firebase-config.template.js firebase-config.js
+   ```
+   - Edit `firebase-config.js` with your actual Firebase project credentials
+   - **⚠️ NEVER commit `firebase-config.js` to Git** - it's already in `.gitignore`
+
+3. **Firebase Setup**: Follow `firebase_setup.md` to configure the database
+4. **Apply Firestore Security Rules**: Copy rules from `firestore-security-rules.txt` to Firebase Console
+5. **Open `index.html`** in a browser or use a local server:
+   ```bash
+   # Using Python
+   python -m http.server 8080
+   
+   # Or using Node.js
+   npx http-server
+   ```
+6. **Complete the recruitment challenges!**
+
+### 🔒 **Security Notes**
+
+- All sensitive configuration is in `.gitignore`
+- Firebase API keys are client-safe but should still be protected
+- Database access is controlled by Firestore Security Rules
+- Never commit files containing real API keys or secrets
 
 ## File Structure
 
