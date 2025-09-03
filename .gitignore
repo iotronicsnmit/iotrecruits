@@ -70,7 +70,7 @@ node_modules/
 .env.production.local
 
 # Firebase configuration with secrets
-firebase-config.js
+# firebase-config.js  # Commented out - this file contains public config safe to deploy
 firebase-config.local.js
 
 # API keys and secrets
